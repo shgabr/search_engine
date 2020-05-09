@@ -62,6 +62,9 @@ int URL::getEdges (){
 void URL::incEdge (){
         edge++;
 }
+void URL::decEdges (){
+        edge--;
+}
 void URL::insertKeyword (string kw){
         keywords.insert(keywords.end(),kw);
 }

@@ -33,6 +33,7 @@ class URL
             double getRank ();                                  //getter for rank
             void computeRank ();                                //computes rank for URL
             void incEdge ();                                    //increment the number of edges
+            void decEdges ();                                   //decrement the number of edges
             int getEdges ();                                    //getter for number of edges
             void insertKeyword (string keyword_p);              //insert keywords in vector
             void sortKeywords ();                               //sorts the keyword vector

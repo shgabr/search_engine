@@ -117,6 +117,7 @@ void WebPage::uFile_handler (string U_file)
         string cmd, temp, link, lineS;
         int u = fscanf (uFile, "%[^\n]\n", lineC);
 
+        //read until end of file
         while (u != EOF) {
 
                 lineS = lineC;
@@ -129,7 +130,7 @@ void WebPage::uFile_handler (string U_file)
                 }
                 else if (cmd == "R"){
                         getline (S,link,'\n');
-                        //
+                        cmdRMV (link);
                 }
                 else if (cmd == "U"){
                         getline (S,link,',');
@@ -139,64 +140,100 @@ void WebPage::uFile_handler (string U_file)
                         upd = stoi(temp);
                         std::cout << cmd << " " << link << endl;
                         cout << imp << " " << upd << endl;
-                        //
+                        int loc = cmdUPD (link, imp, upd);
 
+                        //parse string until spaces to get command and link
                         while (getline (S,temp,' ')){
+                                string link2;
                                 cmd = temp;
                                 getline (S,temp,' ');
-                                link = temp;
-                                std::cout << cmd << " " << link << endl;
-                                //
-
+                                link2 = temp;
+                                std::cout << cmd << " " << link2 << endl;
+                                if (cmd == "A"){
+                                        cmdADD (link, link2, loc);
+                                } else if (cmd == "R"){
+                                        cmdRMV (link, link2, loc);
+                                }
                         }
 
                 }
+                // read until end of line and save in lineC
                 u = fscanf (uFile, "%[^\n]\n", lineC);
-                std::cout << cmd << " " << link << endl;
+                //std::cout << cmd << " " << link << endl;
         }
+        // since the number of edges could have changed then we need to compute page rank again
+        computePR();
 
 }
-void WebPage::cmdADD (string link){
+int WebPage::cmdUPD (string link, int imp, int ct){
+
+        // finds location of link (if doesn't exist then add it)
+        int loc = find (link);
+        if (loc == -1){
+                cmdADD (link);
+                loc = links.size()-1;
+        }
+        //update the impressions and click-through counters
+        webSites[loc]->setIMP(imp);
+        webSites[loc]->setCT(ct);
+        return loc;
+
+}
+int WebPage::cmdADD (string link){
 
         printf("entered ADD1\n");
-        if (find(link) == -1){
+        //if link doesnt exist then create it
+        int loc = find(link);
+        if (loc == -1){
                 webSites.insert(webSites.end(), new URL(link));
                 links.insert(links.end(), link);
                 printf("Successfully added %s\n",link.c_str());
+                loc = links.size()-1;
         }
+        return loc;
 
 }
-void WebPage::cmdADD (string linkfrom, string linkto){
+void WebPage::cmdADD (string linkfrom, string linkto, int loc){
 
         printf("entered ADD2\n");
 
+        // finds second link and if it doesnt exist then create it
+        int loc2 = find (linkto);
+        if (loc2 != -1){
+                loc2 = cmdADD (linkto);
+        }
 
-
+        // create an edge between linkfrom to linkto and increment edges of linkfrom
+        graph [loc][loc2] = 1;
+        webSites [loc]->incEdge();
 
 }
 void WebPage::cmdRMV (string link){
 
         printf("entered RMV1\n");
-        int loc;
-        if (loc=find(link) != -1){
+        //find the location of link then remove the link URL and graph
+        int loc = find(link);
+        if (loc != -1){
                 loc = loc - 1;
                 webSites.erase(webSites.begin()+loc);
                 links.erase(links.begin()+loc);
                 graph.erase (graph.begin()+loc);
-                for (int j=0; j<graph.size(); j++,k++)
+                for (int j=0; j<graph.size(); j++)
                        graph[j].erase (graph[j].begin()+loc);
                 printf("Successfully removed %s\n",link.c_str());
         }
 
-
-
 }
-void WebPage::cmdRMV (string linkfrom, string linkto){
+void WebPage::cmdRMV (string linkfrom, string linkto, int loc){
 
         printf("entered RMV2\n");
 
-
-
+        // if linkto exists then remove the edge between linkfrom to linkto
+        int loc2 = find (linkto);
+        if (loc2 != -1){
+                graph [loc][loc2] = 0;
+                webSites [loc]->decEdges ();
+        }
 
 }
 void WebPage::AND_handler (string keywords)
@@ -206,6 +243,7 @@ void WebPage::AND_handler (string keywords)
         // create a new URL vector and sort it depending on rank
         vector <URL*> rankedURL = webSites;
         double s = rankedURL.size();
+        //computePR ();
         for (int i=0; i<s; i++){
                 rankedURL[i]->computeRank();
         }
@@ -256,11 +294,12 @@ void WebPage::AND_handler (string keywords)
 }
 void WebPage::OR_handler (string keywords)
 {
-        printf("entered OR\n");
+        //printf("entered OR\n");
 
         // create a new URL vector and sort it depending on rank
         vector <URL*> rankedURL = webSites;
         double s = rankedURL.size();
+        //computePR ();
         for (int i=0; i<s; i++){
                 rankedURL[i]->computeRank();
         }
@@ -370,7 +409,7 @@ int WebPage::partition (vector <URL*> & A, int p, int r){
         URL * pivot = A[p];
         int i=p, j=r;
 
-        // sort depending on rank and sort descendingly based on rank
+        // sort descendingly based on rank
         do {
             do {i++;} while(*A[i]>*pivot && i<A.size()-1);
             do {j--;} while(*A[j]<*pivot);
@@ -403,6 +442,7 @@ void WebPage::printGraph (){
 }
 WebPage::~WebPage ()
 {
+        // if files are not closed then close them
         if (gFile != NULL) fclose (gFile);
         if (kFile != NULL) fclose (kFile);
         if (uFile != NULL) fclose (uFile);

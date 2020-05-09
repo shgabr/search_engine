@@ -15,16 +15,17 @@ class WebPage
         vector <string> links;                                          //stores the link names
         vector < vector<int> > graph;                                   //graph of links
         void uFile_handler (string U_file);                             //handles update file
-        void cmdADD (string link);                                      //handles ADD link command when coming from Ufile
-        void cmdADD (string linkfrom, string linkto);                   //handles ADD link command when coming from update command
+        int cmdUPD (string link, int imp, int ct);                      //handles UPDATE link command
+        int cmdADD (string link);                                       //handles ADD link command when coming from Ufile
+        void cmdADD (string linkfrom, string linkto, int loc);          //handles ADD link command when coming from update command
         void cmdRMV (string link);                                      //handles REMOVE link command when coming from Ufile
-        void cmdRMV (string linkfrom, string linkto);                   //handles REMOVE link command when coming from update command
+        void cmdRMV (string linkfrom, string linkto, int loc);          //handles REMOVE link command when coming from update command
         void AND_handler (string keywords);                             //handles AND command
         void OR_handler (string keywords);                              //handles OR command
         int find (string link);                                         //finds location of link
         void computePR ();                                              //computes the page rank of each link
-        void sortURLRank (vector <URL*> &, int, int);                     //sort the URL based on rank (quick sort)
-        int partition (vector <URL*> &, int, int);                        //calculates partition for quick sort
+        void sortURLRank (vector <URL*> &, int, int);                   //sort the URL based on rank (quick sort)
+        int partition (vector <URL*> &, int, int);                      //calculates partition for quick sort
         void printGraph ();
     public:
         WebPage (string G_file, string K_file);                         //constructor
