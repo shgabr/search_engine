@@ -10,16 +10,16 @@
 #include <inttypes.h>
 #include <time.h>
 #include <sys/timeb.h>
-#include <pthread.h>
-#include <errno.h>
-#include <errno.h>
 #include <iostream>
 #include <string>
 #include <sstream>
 #include <stdint.h>
 #include <map>
 #include <vector>
+#include <exception>
+#include <chrono>
 
 using namespace std;
+using namespace std::chrono;
 
 #endif

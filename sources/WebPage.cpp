@@ -27,8 +27,9 @@ WebPage::WebPage (string G_file, string K_file)
         for (int i=0; i<size_gf; i++)
                 graph[i].resize(size_gf);
 
-        //printf("Opened graph file\n");
-        //printf("Opened keywords file\n");
+        printf("Opened Graph file\n");
+        printf("Opened Keywords file\n");
+
 }
 void WebPage::initialize ()
 {
@@ -62,7 +63,6 @@ void WebPage::initialize ()
                 graph [lf][lt] = 1;
                 webSites[lf]->incEdge();
 
-                //std::cout << linkFrom << " " << linkTo << endl;
                 g = fscanf (gFile, "%[^\n]\n", lineC);
 
         }
@@ -94,9 +94,140 @@ void WebPage::initialize ()
         }
 
         computePR ();
-        //printGraph ();
 
 }
+long WebPage::handler (string cmd)
+{
+
+        // checks the command is which type
+        if (cmd[0] == '-')
+                uFile_handler (cmd);
+
+        else if (cmd[0] == '\"')
+                return AND_handler (cmd);
+        else
+                return OR_handler (cmd);
+
+        return 0;
+}
+long WebPage::AND_handler (string keywords)
+{
+
+        // create a new URL vector and sort it depending on rank
+        vector <URL*> rankedURL = webSites;
+        double s = rankedURL.size();
+        for (int i=0; i<s; i++){
+                rankedURL[i]->computeRank();
+        }
+        sortURLRank (rankedURL, 0, s-1);
+
+        // parses the strings into seperate words (max 10) also removing quotations
+        stringstream S (keywords);
+        string kw [10], temp;
+        int k=0;
+        while (getline (S,temp,' ') && k<10){
+                kw[k] = temp;
+                k++;
+        }
+        for (int i=0; i<k; i++){
+                kw[i].erase(remove(kw[i].begin(), kw[i].end(), '\"'), kw[i].end());
+        }
+
+        // checks if all keywords exists in a URL and prints if all exists
+        map <int, URL*> results;
+        int count = 0;
+        for (int i=0; i<s; i++){
+                bool successful = true;
+                for (int j=0; j<k; j++){
+                        if (!rankedURL[i]->findKeyword(kw[j]))
+                                successful = false;
+                }
+                if (successful){
+                        rankedURL[i]->incIMP();
+                        cout << rankedURL[i]->getLinkname() << "\n";
+                        results.insert(pair<int,URL*>(count,rankedURL[i]));
+                        count++;
+                }
+        }
+
+        // getting the link number to click on to increment click-through
+        auto checkStart = high_resolution_clock::now();
+        if (count){
+                int clickno;
+                printf("Enter link number to click on: ");
+                cin >> clickno;
+                while (clickno < 1 || clickno > count){
+                        string no;
+                        printf("Error link number does not exist! Re-enter: ");
+                        cin >> no;
+                        clickno = stoi(no);
+                }
+                results[clickno-1]->incCT();
+        } else
+                printf("No links with keywords searched!\n");
+
+        cin.ignore();
+        auto checkStop = high_resolution_clock::now();
+        auto duration = duration_cast<microseconds>(checkStop - checkStart);
+        return duration.count();
+
+}
+long WebPage::OR_handler (string keywords)
+{
+
+        // create a new URL vector and sort it depending on rank
+        vector <URL*> rankedURL = webSites;
+        double s = rankedURL.size();
+        for (int i=0; i<s; i++){
+                rankedURL[i]->computeRank();
+        }
+        sortURLRank (rankedURL, 0, s-1);
+
+        // parses the strings into seperate words (max 10)
+        stringstream S (keywords);
+        string kw [10], temp;
+        int k=0;
+        while (getline (S,temp,' ') && k<10){
+                kw[k] = temp;
+                k++;
+        }
+        // checks if a keyword exists in a URL and prints URL if one exists
+        map <int, URL*> results;
+        int count = 0;
+        for (int i=0; i<s; i++){
+                bool successful = false;
+                for (int j=0; j<k; j++){
+                        if (rankedURL[i]->findKeyword(kw[j]))
+                                successful = true;
+                }
+                if (successful){
+                        rankedURL[i]->incIMP();
+                        cout << rankedURL[i]->getLinkname() << "\n";
+                        results.insert(pair<int,URL*>(count,rankedURL[i]));
+                        count++;
+                }
+        }
+
+        // getting the link number to click on to increment click-through
+        auto checkStart = high_resolution_clock::now();
+        if (count){
+                int clickno;
+                printf("Enter link number to click on: ");
+                cin >> clickno;
+                while (clickno < 1 || clickno > count){
+                        printf("Error link number does not exist! Re-enter: ");
+                        cin >> clickno;
+                }
+                results[clickno-1]->incCT();
+        } else
+                printf("No links with keywords searched!\n");
+
+        cin.ignore();
+        auto checkStop = high_resolution_clock::now();
+        auto duration = duration_cast<microseconds>(checkStop - checkStart);
+        return duration.count();
+}
+
 void WebPage::uFile_handler (string U_file)
 {
         if (uFile != NULL) fclose (uFile);
@@ -138,8 +269,6 @@ void WebPage::uFile_handler (string U_file)
                         imp = stoi(temp);
                         getline (S,temp,',');
                         upd = stoi(temp);
-                        std::cout << cmd << " " << link << endl;
-                        cout << imp << " " << upd << endl;
                         int loc = cmdUPD (link, imp, upd);
 
                         //parse string until spaces to get command and link
@@ -148,7 +277,6 @@ void WebPage::uFile_handler (string U_file)
                                 cmd = temp;
                                 getline (S,temp,' ');
                                 link2 = temp;
-                                std::cout << cmd << " " << link2 << endl;
                                 if (cmd == "A"){
                                         cmdADD (link, link2, loc);
                                 } else if (cmd == "R"){
@@ -159,7 +287,6 @@ void WebPage::uFile_handler (string U_file)
                 }
                 // read until end of line and save in lineC
                 u = fscanf (uFile, "%[^\n]\n", lineC);
-                //std::cout << cmd << " " << link << endl;
         }
         // since the number of edges could have changed then we need to compute page rank again
         computePR();
@@ -176,12 +303,12 @@ int WebPage::cmdUPD (string link, int imp, int ct){
         //update the impressions and click-through counters
         webSites[loc]->setIMP(imp);
         webSites[loc]->setCT(ct);
+        printf("Successfully updated impressions and click_through of %s\n",link.c_str());
         return loc;
 
 }
 int WebPage::cmdADD (string link){
 
-        printf("entered ADD1\n");
         //if link doesnt exist then create it
         int loc = find(link);
         if (loc == -1){
@@ -195,26 +322,23 @@ int WebPage::cmdADD (string link){
 }
 void WebPage::cmdADD (string linkfrom, string linkto, int loc){
 
-        printf("entered ADD2\n");
-
         // finds second link and if it doesnt exist then create it
         int loc2 = find (linkto);
-        if (loc2 != -1){
+        if (loc2 == -1){
                 loc2 = cmdADD (linkto);
         }
 
         // create an edge between linkfrom to linkto and increment edges of linkfrom
         graph [loc][loc2] = 1;
         webSites [loc]->incEdge();
+        printf("Successfully added edge between %s and %s\n",linkfrom.c_str(),linkto.c_str());
 
 }
 void WebPage::cmdRMV (string link){
 
-        printf("entered RMV1\n");
         //find the location of link then remove the link URL and graph
         int loc = find(link);
         if (loc != -1){
-                loc = loc - 1;
                 webSites.erase(webSites.begin()+loc);
                 links.erase(links.begin()+loc);
                 graph.erase (graph.begin()+loc);
@@ -226,135 +350,14 @@ void WebPage::cmdRMV (string link){
 }
 void WebPage::cmdRMV (string linkfrom, string linkto, int loc){
 
-        printf("entered RMV2\n");
-
         // if linkto exists then remove the edge between linkfrom to linkto
         int loc2 = find (linkto);
         if (loc2 != -1){
                 graph [loc][loc2] = 0;
                 webSites [loc]->decEdges ();
+                printf("Successfully removed edge between %s and %s\n",linkfrom.c_str(),linkto.c_str());
         }
 
-}
-void WebPage::AND_handler (string keywords)
-{
-        //printf("entered AND\n");
-
-        // create a new URL vector and sort it depending on rank
-        vector <URL*> rankedURL = webSites;
-        double s = rankedURL.size();
-        //computePR ();
-        for (int i=0; i<s; i++){
-                rankedURL[i]->computeRank();
-        }
-        sortURLRank (rankedURL, 0, s-1);
-
-        // parses the strings into seperate words (max 10) also removing quotations
-        stringstream S (keywords);
-        string kw [10], temp;
-        int k=0;
-        while (getline (S,temp,' ') && k<10){
-                kw[k] = temp;
-                k++;
-        }
-        for (int i=0; i<k; i++){
-                kw[i].erase(remove(kw[i].begin(), kw[i].end(), '\"'), kw[i].end());
-        }
-
-        // checks if all keywords exists in a URL and prints if all exists
-        map <int, URL*> results;
-        int count = 0;
-        for (int i=0; i<s; i++){
-                bool successful = true;
-                for (int j=0; j<k; j++){
-                        if (!rankedURL[i]->findKeyword(kw[j]))
-                                successful = false;
-                }
-                if (successful){
-                        rankedURL[i]->incIMP();
-                        cout << rankedURL[i]->getLinkname() << "\n";
-                        results.insert(pair<int,URL*>(count,rankedURL[i]));
-                        count++;
-                }
-        }
-
-        // getting the link number to click on to increment click-through
-        if (count){
-                int clickno;
-                printf("Enter link number to click on: ");
-                cin >> clickno;
-                while (clickno < 1 || clickno > count){
-                        printf("Error link number does not exist! Re-enter: ");
-                        cin >> clickno;
-                }
-                results[clickno-1]->incCT();
-        } else
-                printf("No links with keywords searched. Press enter to continue...");
-
-}
-void WebPage::OR_handler (string keywords)
-{
-        //printf("entered OR\n");
-
-        // create a new URL vector and sort it depending on rank
-        vector <URL*> rankedURL = webSites;
-        double s = rankedURL.size();
-        //computePR ();
-        for (int i=0; i<s; i++){
-                rankedURL[i]->computeRank();
-        }
-        sortURLRank (rankedURL, 0, s-1);
-        for (int i=0; i<s; i++)
-                cout << rankedURL[i]->getRank() << endl;
-
-        // parses the strings into seperate words (max 10)
-        stringstream S (keywords);
-        string kw [10], temp;
-        int k=0;
-        while (getline (S,temp,' ') && k<10){
-                kw[k] = temp;
-                k++;
-        }
-        // checks if a keyword exists in a URL and prints URL if one exists
-        map <int, URL*> results;
-        int count = 0;
-        for (int i=0; i<s; i++){
-                bool successful = false;
-                for (int j=0; j<k; j++){
-                        if (rankedURL[i]->findKeyword(kw[j]))
-                                successful = true;
-                }
-                if (successful){
-                        rankedURL[i]->incIMP();
-                        cout << rankedURL[i]->getLinkname() << "\n";
-                        results.insert(pair<int,URL*>(count,rankedURL[i]));
-                        count++;
-                }
-        }
-
-        // getting the link number to click on to increment click-through
-        if (count){
-                int clickno;
-                printf("Enter link number to click on: ");
-                cin >> clickno;
-                while (clickno < 1 || clickno > count){
-                        printf("Error link number does not exist! Re-enter: ");
-                        cin >> clickno;
-                }
-                results[clickno-1]->incCT();
-        } else
-                printf("No links with keywords searched. Press enter to continue...");
-
-}
-void WebPage::handler (string cmd)
-{
-        // checks the command is which type
-        if (cmd[0] == '-')
-                uFile_handler (cmd);
-        else if (cmd[0] == '\"')
-                AND_handler (cmd);
-        else
-                OR_handler (cmd);
 }
 
 int WebPage::find (string link){
@@ -397,7 +400,6 @@ void WebPage::computePR (){
                         webSites[i]->setPRN(npr[i]/max);
                 }
                 if (npr[i] == 0) webSites[i]->setPRN(webSites[i]->getPR()/max);
-                //cout << webSites[i]->getPR() << " " << webSites[i]->getPRN() << endl;
         }
 
         delete [] npr;
@@ -438,6 +440,12 @@ void WebPage::printGraph (){
                         cout << graph[i][j] << " ";
                 cout << endl;
         }
+
+}
+void WebPage::printLinks (){
+
+        for (int i=0; i<links.size(); i++)
+                cout << links[i] << endl;
 
 }
 WebPage::~WebPage ()
