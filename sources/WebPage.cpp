@@ -163,10 +163,10 @@ long WebPage::AND_handler (string keywords)
                         clickno = stoi(no);
                 }
                 results[clickno-1]->incCT();
+                cin.ignore();
         } else
                 printf("No links with keywords searched!\n");
 
-        cin.ignore();
         auto checkStop = high_resolution_clock::now();
         auto duration = duration_cast<microseconds>(checkStop - checkStart);
         return duration.count();
@@ -219,10 +219,10 @@ long WebPage::OR_handler (string keywords)
                         cin >> clickno;
                 }
                 results[clickno-1]->incCT();
+                cin.ignore();
         } else
                 printf("No links with keywords searched!\n");
 
-        cin.ignore();
         auto checkStop = high_resolution_clock::now();
         auto duration = duration_cast<microseconds>(checkStop - checkStart);
         return duration.count();

@@ -46,14 +46,13 @@ int main (){
                 printf ("$ Total time to handle command (%s): %lld microseconds\n",command.c_str(),duration.count()-removeT);
 
         }
+        printf("Program Ending\n");
+
         printf("$$ Total time for running all commands: %lld microseconds\n",total_time);
 
         auto absoluteEnd = high_resolution_clock::now();
         auto absoluteDuration = duration_cast<seconds>(absoluteEnd - absoluteStart);
         printf("$$ Total running time of program: %lld seconds\n",absoluteDuration.count());
-
-
-        printf("Program Ending\n");
         return 0;
 
 }
