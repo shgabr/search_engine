@@ -1,7 +1,10 @@
 #include <WebPage.h>
 
-WebPage::WebPage (string G_file, string K_file)
+WebPage::WebPage (string G_file, string K_file)         //Time complexity: O(ng)
 {       //open initialization files and create graph
+        counterA = 0;
+        counterC = 0;
+        counterAC = 0;
 
         gFile = fopen (G_file.c_str(),"r");
 
@@ -31,7 +34,7 @@ WebPage::WebPage (string G_file, string K_file)
         printf("Opened Keywords file\n");
 
 }
-void WebPage::initialize ()
+void WebPage::initialize ()             //Time complexity: O(g+w+nlogm+n^2)
 {
         char lineC [200];
         string lineS;
@@ -110,7 +113,7 @@ long WebPage::handler (string cmd)
 
         return 0;
 }
-long WebPage::AND_handler (string keywords)
+long WebPage::AND_handler (string keywords)     // Time complexity: O(nlogm) && Space complexity: O(n^2)
 {
 
         // create a new URL vector and sort it depending on rank
@@ -118,6 +121,7 @@ long WebPage::AND_handler (string keywords)
         double s = rankedURL.size();
         for (int i=0; i<s; i++){
                 rankedURL[i]->computeRank();
+                counterAC++;
         }
         sortURLRank (rankedURL, 0, s-1);
 
@@ -126,11 +130,13 @@ long WebPage::AND_handler (string keywords)
         string kw [10], temp;
         int k=0;
         while (getline (S,temp,' ') && k<10){
+                counterAC++;
                 kw[k] = temp;
                 k++;
         }
         for (int i=0; i<k; i++){
                 kw[i].erase(remove(kw[i].begin(), kw[i].end(), '\"'), kw[i].end());
+                counterAC+=4;
         }
 
         // checks if all keywords exists in a URL and prints if all exists
@@ -139,10 +145,13 @@ long WebPage::AND_handler (string keywords)
         for (int i=0; i<s; i++){
                 bool successful = true;
                 for (int j=0; j<k; j++){
+                        counterC++;
+                        counterAC+=2;
                         if (!rankedURL[i]->findKeyword(kw[j]))
                                 successful = false;
                 }
                 if (successful){
+                        counterAC+=3;
                         rankedURL[i]->incIMP();
                         cout << rankedURL[i]->getLinkname() << "\n";
                         results.insert(pair<int,URL*>(count,rankedURL[i]));
@@ -162,6 +171,7 @@ long WebPage::AND_handler (string keywords)
                         cin >> no;
                         clickno = stoi(no);
                 }
+                counterAC++;
                 results[clickno-1]->incCT();
                 cin.ignore();
         } else
@@ -172,7 +182,7 @@ long WebPage::AND_handler (string keywords)
         return duration.count();
 
 }
-long WebPage::OR_handler (string keywords)
+long WebPage::OR_handler (string keywords)      // Time complexity: O(nlogm) && Space complexity: O(n^2)
 {
 
         // create a new URL vector and sort it depending on rank
@@ -188,6 +198,7 @@ long WebPage::OR_handler (string keywords)
         string kw [10], temp;
         int k=0;
         while (getline (S,temp,' ') && k<10){
+                counterAC++;
                 kw[k] = temp;
                 k++;
         }
@@ -197,6 +208,8 @@ long WebPage::OR_handler (string keywords)
         for (int i=0; i<s; i++){
                 bool successful = false;
                 for (int j=0; j<k; j++){
+                        counterC++;
+                        counterAC+=2;
                         if (rankedURL[i]->findKeyword(kw[j]))
                                 successful = true;
                 }
@@ -204,6 +217,7 @@ long WebPage::OR_handler (string keywords)
                         rankedURL[i]->incIMP();
                         cout << rankedURL[i]->getLinkname() << "\n";
                         results.insert(pair<int,URL*>(count,rankedURL[i]));
+                        counterAC+=3;
                         count++;
                 }
         }
@@ -218,6 +232,7 @@ long WebPage::OR_handler (string keywords)
                         printf("Error link number does not exist! Re-enter: ");
                         cin >> clickno;
                 }
+                counterAC++;
                 results[clickno-1]->incCT();
                 cin.ignore();
         } else
@@ -256,14 +271,17 @@ void WebPage::uFile_handler (string U_file)
                 getline (S,cmd,',');
 
                 if (cmd == "A"){
+                        counterC++;
                         getline (S,link,'\n');
                         cmdADD (link);
                 }
                 else if (cmd == "R"){
+                        counterC+=2;
                         getline (S,link,'\n');
                         cmdRMV (link);
                 }
                 else if (cmd == "U"){
+                        counterC+=3;
                         getline (S,link,',');
                         getline (S,temp,',');
                         imp = stoi(temp);
@@ -292,7 +310,7 @@ void WebPage::uFile_handler (string U_file)
         computePR();
 
 }
-int WebPage::cmdUPD (string link, int imp, int ct){
+int WebPage::cmdUPD (string link, int imp, int ct){     //Time complexity: O(n)
 
         // finds location of link (if doesn't exist then add it)
         int loc = find (link);
@@ -303,11 +321,12 @@ int WebPage::cmdUPD (string link, int imp, int ct){
         //update the impressions and click-through counters
         webSites[loc]->setIMP(imp);
         webSites[loc]->setCT(ct);
+        counterAC+=2;
         printf("Successfully updated impressions and click_through of %s\n",link.c_str());
         return loc;
 
 }
-int WebPage::cmdADD (string link){
+int WebPage::cmdADD (string link){      //Time complexity: O(n)
 
         //if link doesnt exist then create it
         int loc = find(link);
@@ -320,7 +339,7 @@ int WebPage::cmdADD (string link){
         return loc;
 
 }
-void WebPage::cmdADD (string linkfrom, string linkto, int loc){
+void WebPage::cmdADD (string linkfrom, string linkto, int loc){         //Time complexity: O(n)
 
         // finds second link and if it doesnt exist then create it
         int loc2 = find (linkto);
@@ -331,10 +350,11 @@ void WebPage::cmdADD (string linkfrom, string linkto, int loc){
         // create an edge between linkfrom to linkto and increment edges of linkfrom
         graph [loc][loc2] = 1;
         webSites [loc]->incEdge();
+        counterAC+=2;
         printf("Successfully added edge between %s and %s\n",linkfrom.c_str(),linkto.c_str());
 
 }
-void WebPage::cmdRMV (string link){
+void WebPage::cmdRMV (string link){     //Time complexity: O(ns)
 
         //find the location of link then remove the link URL and graph
         int loc = find(link);
@@ -348,19 +368,20 @@ void WebPage::cmdRMV (string link){
         }
 
 }
-void WebPage::cmdRMV (string linkfrom, string linkto, int loc){
+void WebPage::cmdRMV (string linkfrom, string linkto, int loc){         //Time complexity: O(n)
 
         // if linkto exists then remove the edge between linkfrom to linkto
         int loc2 = find (linkto);
         if (loc2 != -1){
                 graph [loc][loc2] = 0;
                 webSites [loc]->decEdges ();
+                counterAC+=2;
                 printf("Successfully removed edge between %s and %s\n",linkfrom.c_str(),linkto.c_str());
         }
 
 }
 
-int WebPage::find (string link){
+int WebPage::find (string link){   //Time complexity: O(n)
 
         // loop on link vector and get location of link
         int j=0;
@@ -372,7 +393,7 @@ int WebPage::find (string link){
         return -1;
 
 }
-void WebPage::computePR (){
+void WebPage::computePR (){     //Time complexity: O(n^2) && Space complexity: O(n)
 
         int s = links.size();
         double * npr = new double [s];
@@ -384,22 +405,38 @@ void WebPage::computePR (){
         double max = 0;
         for (int j=0; j<s; j++){
                 for (int i=0; i<s; i++){
+                        counterAC++;
+                        counterC++;
                         if (graph[i][j] == 1){
+                                counterA+=2;
+                                counterAC+=3;
                                 npr [j] += webSites[i]->getPR() / webSites[i]->getEdges();
                         }
                 }
+                counterC++;
+                counterAC++;
                 if (npr[j]>max){
+                        counterAC++;
                         max = npr[j];
                 }
         }
 
         // set page rank and page rank normalizaed in each URL
         for (int i=0; i<s; i++){
+                counterAC++;
+                counterC++;
                 if (npr[i] != 0){
+                        counterAC+=4;
+                        counterA++;
                         webSites[i]->setPR(npr[i]);
                         webSites[i]->setPRN(npr[i]/max);
                 }
-                if (npr[i] == 0) webSites[i]->setPRN(webSites[i]->getPR()/max);
+                counterC++;
+                if (npr[i] == 0){
+                        counterAC+=2;
+                        counterA++;
+                        webSites[i]->setPRN(webSites[i]->getPR()/max);
+                }
         }
 
         delete [] npr;
@@ -408,47 +445,64 @@ void WebPage::computePR (){
 int WebPage::partition (vector <URL*> & A, int p, int r){
 
         // pivot is first element
+        counterAC++;
         URL * pivot = A[p];
         int i=p, j=r;
 
         // sort descendingly based on rank
         do {
-            do {i++;} while(*A[i]>*pivot && i<A.size()-1);
-            do {j--;} while(*A[j]<*pivot);
+            do {i++;  counterAC++; counterC+=2; counterA++; } while(*A[i]>*pivot && i<A.size()-1);
+            do {j--; counterAC++; counterC++; counterA++; } while(*A[j]<*pivot);
+            counterC+=2;
             if (i<j) swap(A[i], A[j]);
         } while (i<j);
 
         A[p] = A[j];
         A[j] = pivot;
+        counterAC+=3;
         return j;
 
 }
-void WebPage::sortURLRank (vector <URL*> & A, int p, int r){
+void WebPage::sortURLRank (vector <URL*> & A, int p, int r){  //Time complexity: O(nlogn)
 
         // quick sort
+        counterC++;
         if (p<r){
             int q = partition (A, p, r+1);
             sortURLRank(A, p, q-1);
             sortURLRank(A, q+1, r);
         }
 }
-void WebPage::printGraph (){
+void WebPage::printGraph (){    //Time complexity: O(n^2)
+        int s = links.size();
+        extra::print2D (graph, s, s);
+
+}
+void WebPage::printLinks (){    //Time complexity: O(n)
+        extra::print1D (links, links.size());
+
+}
+void WebPage::counters (){
 
         int s = links.size();
+        int cA, cC, cAC;
         for (int i=0; i<s; i++){
-                for (int j=0; j<s; j++)
-                        cout << graph[i][j] << " ";
-                cout << endl;
+                webSites[i]->getcounts (cA, cC, cAC);
+                counterA += cA;
+                counterC += cC;
+                counterAC += cAC;
         }
 
-}
-void WebPage::printLinks (){
+        printf("$ Total arithmetic operations done for command: %ld\n",counterA);
+        printf("$ Total comparisons done for command: %ld\n",counterC);
+        printf("$ Total array accesses done for command: %ld\n",counterAC);
 
-        for (int i=0; i<links.size(); i++)
-                cout << links[i] << endl;
+        counterA = 0;
+        counterC = 0;
+        counterAC = 0;
 
 }
-WebPage::~WebPage ()
+WebPage::~WebPage ()    //Time complexity: 0(1)
 {
         // if files are not closed then close them
         if (gFile != NULL) fclose (gFile);

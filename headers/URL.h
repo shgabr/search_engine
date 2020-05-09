@@ -2,6 +2,7 @@
 #define URL_H_
 
 #include <includes.h>
+#include <extra.h>
 
 
 class URL
@@ -16,7 +17,12 @@ class URL
             double imp;                                         //number of impressions
             double ctr;                                         //the click_through rate
             int edge;                                           //the number of outbound edges the URL has
-            bool binaySearch (string key, int x, int z);
+            long counterA;                                      //counter for arithmetic operations
+            long counterC;                                      //counter for comparisons
+            long counterAC;                                     //counter for array accesses
+            int partition (vector <string> & A, int p, int r);
+            void quick_sort (vector <string> & A, int p, int r);
+            bool binarySearch (vector <string> A, string key, int x, int z);
     public:
             URL (string link_name);                             //constructor
             string getLinkname ();                              //getter for link name
@@ -36,9 +42,9 @@ class URL
             void decEdges ();                                   //decrement the number of edges
             int getEdges ();                                    //getter for number of edges
             void insertKeyword (string keyword_p);              //insert keywords in vector
-            void sortKeywords ();                               //sorts the keyword vector
-            bool findKeyword (string key);                      //find the keyword inside the vector
-
+/*O(nlogn)*/void sortKeywords ();                               //sorts the keyword vector
+/*O(logn)*/ bool findKeyword (string key);                      //find the keyword inside the vector
+            void getcounts (int & cA, int & cC, int & cAC);     //getter for all counters
             bool operator < (URL x){                            //operator overloading for less than operator
                     return (this->rank < x.rank);
             };

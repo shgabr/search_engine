@@ -43,6 +43,8 @@ int main (){
                 auto stop = high_resolution_clock::now();
                 auto duration = duration_cast<microseconds>(stop - start);
                 total_time = total_time + duration.count() - removeT;
+
+                search_engine.counters();
                 printf ("$ Total time to handle command (%s): %lld microseconds\n",command.c_str(),duration.count()-removeT);
 
         }
