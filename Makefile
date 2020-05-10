@@ -20,7 +20,7 @@ $(OBJECTS)/URL.o: $(SOURCES)/URL.cpp
 	$(GCC) $(GCC_FLAGS)  $(INCLUDES) $(SOURCES)/URL.cpp -o $(OBJECTS)/URL.o
 
 fullwebpage: ./Full_webpage.cpp
-	$(GCC) $(GCC_FLAGS) ./Full_webpage.cpp -o $(BIN)/fullwebpage
+	$(GCC) ./Full_webpage.cpp -o $(BIN)/fullwebpage
 
 
 
