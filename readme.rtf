@@ -1,0 +1,123 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2512
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica-Bold;\f1\fswiss\fcharset0 Helvetica;\f2\fswiss\fcharset0 Helvetica-Oblique;
+}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid1\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{decimal\}.}{\leveltext\leveltemplateid2\'02\'01.;}{\levelnumbers\'01;}\fi-360\li1440\lin1440 }{\listname ;}\listid1}
+{\list\listtemplateid2\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid101\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{decimal\}.}{\leveltext\leveltemplateid102\'02\'01.;}{\levelnumbers\'01;}\fi-360\li1440\lin1440 }{\listname ;}\listid2}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}{\listoverride\listid2\listoverridecount0\ls2}}
+\paperw11900\paperh16840\margl1440\margr1440\vieww14180\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\b\fs24 \cf0 \ul \ulc0 To build program:\
+\
+
+\f1\b0 \ulnone Write on command line: 
+\f2\i make
+\f1\i0 \
+In order of makefile to work:\
+- The source code must be inside the 
+\f2\i sources 
+\f1\i0 directory\
+- The headers code (includes) must be inside the 
+\f2\i headers 
+\f1\i0 directory\
+- Directory (obj) must exist\
+- All of these directories must exist inside a command directory as the makefile\
+\
+
+\f0\b \ul \
+To run program:
+\f1\b0 \ulnone \
+\
+After building the program, type the command 
+\f2\i ./webpage 
+\f1\i0 on terminal opened to the directory of the makefile to run the program.\
+\
+\
+
+\f0\b \ul Program Functionalities:
+\f1\b0 \ulnone \
+\
+- The program takes an input file that initializes how the links are connected. It should be in the same directory as the executable. The file format should be the following:\
+	\
+
+\f2\i    	           linkfrom,linkto
+\f1\i0 \
+	www.test1.com,www.test2.com\
+	www.test2.com,www.test3.com\
+	www.test3.com,www.test5.com\
+	www.test1.com,www.test3.com\
+\
+- The program takes a second input file that initializes the keywords for each URL. It should be in the same directory as the executable. The file format should be the following:\
+\
+
+\f2\i          URL_name,Any,number,of,keywords,max,10
+\f1\i0 \
+	www.test1.com,data,structures,complexity\
+	www.test2.com,machine,learning\
+	www.test3.com,programming,complexity,procedural,objects\
+	www.test5.com,graph,complex,learning,algorithms\
+\
+- Then the program asks for a specific command. There are 2 main commands (query or updating)\
+\pard\tx220\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\li720\fi-720\pardirnatural\partightenfactor0
+\ls1\ilvl0\cf0 {\listtext	\uc0\u8226 	}Query: searching for specific keywords that belong to a certain link. There are 2 ways to issue a query.\
+\pard\tx940\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\li1440\fi-1440\pardirnatural\partightenfactor0
+\ls1\ilvl1\cf0 {\listtext	1.	}AND: finds URL that contains all keywords. Format: 
+\f2\i \'93data\'94 \'93complexity\'94\
+\ls1\ilvl1
+\f1\i0 {\listtext	2.	}OR: finds URL that contains at least one keyword: Format: 
+\f2\i data complexity\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \
+\pard\tx220\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\li720\fi-720\pardirnatural\partightenfactor0
+\ls2\ilvl0
+\f1\i0 \cf0 {\listtext	\uc0\u8226 	}Update: input a file that updates state of link. For entering a file, format: 
+\f2\i -update.txt . 
+\f1\i0 The dash must be entered for program to know that we are inputting a file to update URLs. Webpage can be updated by adding a new URL, removing an existent URL, or updating some parameters of the URL like its impressions, click-through, and its links to other URLs.\
+\pard\tx940\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\li1440\fi-1440\pardirnatural\partightenfactor0
+\ls2\ilvl1\cf0 {\listtext	1.	}ADD: adds new URL. Format: 
+\f2\i A,www.test1.com\
+\ls2\ilvl1
+\f1\i0 {\listtext	2.	}REMOVE: removes an existent URL. Format: 
+\f2\i R,www.test2.com\
+\ls2\ilvl1
+\f1\i0 {\listtext	3.	}UPDATE: update parameters. Format: 
+\f2\i U,www.test3.com,20,4,A www.test4.com R www.test5.com. 
+\f1\i0 It can as many parameters to add and remove links to other URLs.\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \
+	So the general format of an update file:\
+
+\f2\i        Command,link_name.com,parameters if update command
+\f1\i0 \
+		A,www.test1.com\
+		R,www.test2.com\
+		U,www.test3.com,20,4,A www.test4.com R www.test5.com\
+		A,www.test6.com\
+\
+\
+
+\f0\b \ul Extra:
+\f1\b0 \ulnone \
+\
+For convenience, a single source file of the whole program is added to remove that the hassle of directories.\
+To build the program, run 
+\f2\i make fullwebpage\
+
+\f1\i0 And it runs by 
+\f2\i ./fullwebpage
+\f1\i0 \
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+}

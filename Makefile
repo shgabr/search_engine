@@ -19,8 +19,8 @@ $(OBJECTS)/WebPage.o: $(SOURCES)/WebPage.cpp
 $(OBJECTS)/URL.o: $(SOURCES)/URL.cpp
 	$(GCC) $(GCC_FLAGS)  $(INCLUDES) $(SOURCES)/URL.cpp -o $(OBJECTS)/URL.o
 
-test: ./test.cpp
-	$(GCC) $(INCLUDES) ./test.cpp -o $(BIN)/test
+fullwebpage: ./Full_webpage.cpp
+	$(GCC) $(GCC_FLAGS) ./Full_webpage.cpp -o $(BIN)/fullwebpage
 
 
 
