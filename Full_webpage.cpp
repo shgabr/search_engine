@@ -373,8 +373,12 @@ WebPage::WebPage (string G_file, string K_file)         //Time complexity: O(ng)
         }
 
 
-        fseek(gFile, 0, SEEK_END);
-        int size_gf = 2 * ftell(gFile);
+        int size_gf=0;
+        char tc;
+        for (tc = getc(gFile); tc != EOF; tc = getc(gFile))
+                if (tc == '\n')
+                        size_gf++;
+                        
         fseek(gFile, 0, SEEK_SET);
 
         graph.resize(size_gf);
