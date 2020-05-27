@@ -48,7 +48,7 @@ Program Functionalities:
 		 The dash must be entered for program to know that we are inputting a file to update URLs. Webpage can be updated by adding a new URL, removing an existent URL, or updating some parameters of the URL like its impressions, click-through, and its links to other URLs.
 		3.	ADD: adds new URL. Format: 
 		
-				 A,www.test1.com
+				A,www.test1.com
 		5.	REMOVE: removes an existent URL. Format: 
 		
 				R,www.test2.com
