@@ -46,13 +46,14 @@ Program Functionalities:
 	
 			-update.txt 
 		 The dash must be entered for program to know that we are inputting a file to update URLs. Webpage can be updated by adding a new URL, removing an existent URL, or updating some parameters of the URL like its impressions, click-through, and its links to other URLs.
+		 
 		3.	ADD: adds new URL. Format: 
 		
 				A,www.test1.com
-		5.	REMOVE: removes an existent URL. Format: 
+		4.	REMOVE: removes an existent URL. Format: 
 		
 				R,www.test2.com
-		6.	UPDATE: update parameters. Format: 
+		5.	UPDATE: update parameters. Format: 
 		 
 				 U,www.test3.com,20,4,A www.test4.com R www.test5.com. 
 		It can as many parameters to add and remove links to other URLs.
