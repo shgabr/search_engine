@@ -2,6 +2,7 @@
 ## To build program:
 
 Write on command line: make
+
 In order of makefile to work:
 - The source code must be inside the sources directory
 - The headers code (includes) must be inside the headers directory
